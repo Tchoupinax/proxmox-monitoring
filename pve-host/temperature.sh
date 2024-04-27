@@ -28,7 +28,7 @@ startMetrics() {
 
 
   # Disks
-  TMP=/tmp/hdd.$$
+  TMP="/tmp/hdd.$$.$(date +%s)"
   {
     echo "# TYPE temperature gauge"
     echo "# HELP temperature Compponent Temperature"
