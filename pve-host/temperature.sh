@@ -8,25 +8,6 @@ echo "It will be executed every $SLEEP secondes"
 echo "Used URL is $PROMETHEUS_URL"
 
 startMetrics() {
-  # CPU and Motherboard
-  sensors | \
-    egrep "PHY Temperature|MAC Temperature|temp1|Tctl|Tccd1|Tccd2|Core" | \
-    sed 's/°C//g' | \
-    sed -E 's/\(.*?\)//g' | \
-    sed 's/ Temperature/_Temperature/g' | \
-    sed 's/://g' | \
-    sed 's/e /e/g' | \
-    awk 'BEGIN{
-        print("# TYPE temperature gauge");
-        print("# HELP temperature Component Temperature");
-      }
-      {
-      print("temperature{sensor=\""$1"\"} " $2);
-    }' | \
-    sed 's/+//g' | \
-    curl --data-binary @- "$PROMETHEUS_URL/metrics/job/temperature_cpu/instance/pve"
-
-
   # Disks
   TMP="/tmp/hdd.$$.$(date +%s)"
   {
@@ -44,6 +25,24 @@ startMetrics() {
   curl --data-binary @$TMP "$PROMETHEUS_URL/metrics/job/temperature_disk/instance/pve"
 
   [[ -f "$TMP" ]] && rm -rf "$TMP"
+
+  # CPU and Motherboard
+  sensors | \
+    egrep "PHY Temperature|MAC Temperature|temp1|Tctl|Tccd1|Tccd2|Core" | \
+    sed 's/°C//g' | \
+    sed -E 's/\(.*?\)//g' | \
+    sed 's/ Temperature/_Temperature/g' | \
+    sed 's/://g' | \
+    sed 's/e /e/g' | \
+    awk 'BEGIN{
+        print("# TYPE temperature gauge");
+        print("# HELP temperature Component Temperature");
+      }
+      {
+      print("temperature{sensor=\""$1"\"} " $2);
+    }' | \
+    sed 's/+//g' | \
+    curl --data-binary @- "$PROMETHEUS_URL/metrics/job/temperature_cpu/instance/pve"
 }
 
 for i in $(seq 1 $COUNT_BY_MINUTE); do
