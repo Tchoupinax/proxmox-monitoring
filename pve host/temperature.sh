@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# CPU and MB
+PROMETHEUS_URL="${1:-http://192.168.2.183:9091}"
 
+# CPU and Motherboard
 sensors | \
   egrep "PHY Temperature|MAC Temperature|temp1|Tctl|Tccd1|Tccd2" | \
   sed 's/°C//g' | \
@@ -15,13 +16,11 @@ sensors | \
     {
     print("temperature{sensor=\""$1"\"} " $2);
   }' | \
-  curl --data-binary @- http://192.168.2.183:9091/metrics/job/temperature_cpu/instance/pve
+  curl --data-binary @- "$PROMETHEUS_URL/metrics/job/temperature_cpu/instance/pve"
 
 
 # Disks
-
 TMP=/tmp/hdd.$$
-
 {
   echo "# TYPE temperature gauge"
   echo "# HELP temperature Compponent Temperature"
@@ -34,6 +33,6 @@ TMP=/tmp/hdd.$$
   done
 } > $TMP
 
-curl --data-binary @$TMP http://192.168.2.183:9091/metrics/job/temperature_disk/instance/pve
+curl --data-binary @$TMP "http://192.168.2.183:9091/metrics/job/temperature_disk/instance/pve"
 
 [[ -f "$TMP" ]] && rm -rf "$TMP"
