@@ -21,6 +21,7 @@ startMetrics() {
         }'
     done
   } > $TMP
+  cat $TMP
 
   curl --data-binary @$TMP "$PROMETHEUS_URL/metrics/job/temperature_disk/instance/pve"
 
@@ -42,6 +43,7 @@ startMetrics() {
       print("temperature{sensor=\""$1"\"} " $2);
     }' | \
     sed 's/+//g' | \
+    sed 's/\.[0-9]*//g' | \
     curl --data-binary @- "$PROMETHEUS_URL/metrics/job/temperature_cpu/instance/pve"
 }
 
