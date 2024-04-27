@@ -5,11 +5,12 @@ echo "Used URL is $PROMETHEUS_URL"
 
 # CPU and Motherboard
 sensors | \
-  egrep "PHY Temperature|MAC Temperature|temp1|Tctl|Tccd1|Tccd2" | \
+  egrep "PHY Temperature|MAC Temperature|temp1|Tctl|Tccd1|Tccd2|Core" | \
   sed 's/°C//g' | \
   sed -E 's/\(.*?\)//g' | \
   sed 's/ Temperature/_Temperature/g' | \
   sed 's/://g' | \
+  sed 's/e /e/g' | \
   awk 'BEGIN{
       print("# TYPE temperature gauge");
       print("# HELP temperature Component Temperature");
@@ -17,6 +18,7 @@ sensors | \
     {
     print("temperature{sensor=\""$1"\"} " $2);
   }' | \
+  sed 's/+//g' | \
   curl --data-binary @- "$PROMETHEUS_URL/metrics/job/temperature_cpu/instance/pve"
 
 
