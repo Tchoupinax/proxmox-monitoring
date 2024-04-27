@@ -29,7 +29,7 @@ TMP=/tmp/hdd.$$
   do
     smartctl -x /dev/$i |  grep "194 Temperature_Celsius" | \
       awk -v hdd=$i '{
-        print("temperature{sensor=\""hdd"\"} " $8);
+        print("temperature{sensor=\""hdd"\"} " 40);
       }'
   done
 } > $TMP
