@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 PROMETHEUS_URL="${1:-http://192.168.2.183:9091}"
+echo "Used URL is $PROMETHEUS_URL"
 
 # CPU and Motherboard
 sensors | \
@@ -33,6 +34,6 @@ TMP=/tmp/hdd.$$
   done
 } > $TMP
 
-curl --data-binary @$TMP "http://192.168.2.183:9091/metrics/job/temperature_disk/instance/pve"
+curl --data-binary @$TMP "$PROMETHEUS_URL/metrics/job/temperature_disk/instance/pve"
 
 [[ -f "$TMP" ]] && rm -rf "$TMP"
