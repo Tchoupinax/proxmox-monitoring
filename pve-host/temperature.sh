@@ -17,7 +17,7 @@ startMetrics() {
     do
       smartctl -x /dev/$i |  grep "194 Temperature_Celsius" | \
         awk -v hdd=$i '{
-          print("temperature{sensor=\""hdd"\"} " $8);
+          print("temperature{sensor=\""hdd"\"} " $8".0");
         }'
     done
   } > $TMP
@@ -28,12 +28,14 @@ startMetrics() {
 
   # CPU and Motherboard
   sensors | \
-    egrep "PHY Temperature|MAC Temperature|temp1|Tctl|Tccd1|Tccd2|Core" | \
+    egrep "PHY Temperature|MAC Temperature|Tctl|Tccd1|Tccd2|Package id|Core" | \
     sed 's/°C//g' | \
     sed -E 's/\(.*?\)//g' | \
     sed 's/ Temperature/_Temperature/g' | \
     sed 's/://g' | \
     sed 's/e /e/g' | \
+    sed 's/id /e/g' | \
+    sed 's/Packagee0/All/g' | \
     awk 'BEGIN{
         print("# TYPE temperature gauge");
         print("# HELP temperature Component Temperature");
