@@ -12,7 +12,7 @@ startMetrics() {
   TMP="/tmp/hdd.$$.$(date +%s)"
   {
     echo "# TYPE temperature gauge"
-    echo "# HELP temperature Compponent Temperature"
+    echo "# HELP temperature Component Temperature"
     for i in sda sdb sdc sdd sde sdf sdg sdh
     do
       smartctl -x /dev/$i |  grep "194 Temperature_Celsius" | \
